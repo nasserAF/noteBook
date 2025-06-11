@@ -18,7 +18,15 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'txt', 'doc', 'docx', 
 # Initialize Firebase
 try:
     print("Attempting to initialize Firebase...")
-    cred = credentials.Certificate("firebase-key.json")
+    firebase_key_json = os.environ.get('firebase-key')
+    if firebase_key_json:
+        print("Found firebase-key environment variable. Initializing from env var.")
+        cred_json = json.loads(firebase_key_json)
+        cred = credentials.Certificate(cred_json)
+    else:
+        # Fallback to local file for local development
+        print("firebase-key environment variable not found. Falling back to local firebase-key.json file.")
+        cred = credentials.Certificate("firebase-key.json")
     print("Credentials loaded successfully")
     firebase_admin.initialize_app(cred, {
         'projectId': 'notebook-25b3d',
