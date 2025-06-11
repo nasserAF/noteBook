@@ -1,0 +1,474 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Card Styles */
+.card {
+    border-radius: 10px;
+    border: none;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: var(--card-bg);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo Styles */
+.navbar-brand img {
+    height: 55px;
+    transition: transform 0.5s ease, filter 0.3s ease;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.05);
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+/* Card Header Styles */
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    background-color: var(--card-header-bg) !important;
+    color: var(--card-header-text);
+}
+
+/* Feature Box */
+.feature-box {
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    height: 100%;
+}
+
+/* Note Card Styles */
+.note-card {
+    overflow: hidden;
+}
+
+.note-image-container {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+}
+
+.note-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.more-images-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.note-details {
+    max-height: 80px;
+    overflow: hidden;
+}
+
+.note-full-image {
+    max-height: 400px;
+    object-fit: contain;
+}
+
+.note-full-details {
+    white-space: pre-line;
+}
+
+/* Note Card Enhancements */
+.note-card .note-cover-image {
+    height: 180px; /* Adjust height as needed */
+    background-size: cover;
+    background-position: center center;
+    position: relative; /* Needed for absolute positioning of title */
+    display: flex;
+    align-items: flex-end; /* Align title to the bottom */
+}
+
+.note-card .note-cover-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: white;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%); /* Gradient overlay */
+    padding: 0.75rem 1rem 0.5rem; /* Adjust padding */
+    margin-bottom: 0; /* Remove default margin */
+    font-size: 1.1rem; /* Adjust font size */
+    width: 100%; /* Ensure it spans the width */
+}
+
+/* Cover image selection in edit form */
+.cover-image-select input[type="radio"]:checked + img {
+    border: 3px solid var(--bs-primary); /* Highlight selected image */
+    box-shadow: 0 0 8px rgba(var(--bs-primary-rgb), 0.5);
+}
+
+/* Todo List Styles */
+.table th, .table td {
+    vertical-align: middle;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .note-image-container {
+        height: 120px;
+    }
+    
+    .note-full-image {
+        max-height: 300px;
+    }
+}
+
+/* RTL Specific Adjustments */
+.me-auto {
+    margin-right: auto !important;
+    margin-left: 0 !important;
+}
+
+.ms-auto {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}
+
+.me-1, .me-2 {
+    margin-right: 0.25rem !important;
+    margin-left: 0 !important;
+}
+
+.ms-2 {
+    margin-left: 0.5rem !important;
+    margin-right: 0 !important;
+}
+
+/* Dark Mode Styles */
+:root {
+    --bg-color: #f8f9fa;
+    --text-color: #212529;
+    --card-bg: #fff;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --navbar-second-bg: #f8f9fa;
+    --navbar-second-text: #212529;
+    --footer-bg: rgba(0, 0, 0, 0.05);
+    --input-bg: #fff;
+    --input-text: #212529;
+    --input-border: #ced4da;
+    --card-header-bg: #f8f9fa;
+    --card-header-text: #212529;
+    --dropdown-bg: #fff;
+    --dropdown-text: #212529;
+    --table-border: #dee2e6;
+    --table-striped: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --text-color: #f8f9fa;
+    --card-bg: #1e1e1e;
+    --card-shadow: 0 4px 6px rgba(255, 255, 255, 0.05);
+    --navbar-second-bg: #2c2c2c;
+    --navbar-second-text: #f8f9fa;
+    --footer-bg: #2c2c2c;
+    --input-bg: #2c2c2c;
+    --input-text: #f8f9fa;
+    --input-border: #495057;
+    --card-header-bg: #2c2c2c;
+    --card-header-text: #f8f9fa;
+    --dropdown-bg: #2c2c2c;
+    --dropdown-text: #f8f9fa;
+    --table-border: #495057;
+    --table-striped: rgba(255, 255, 255, 0.05);
+}
+
+/* Apply dark mode styles to various elements */
+.form-control, .form-select {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--input-border);
+}
+
+.dropdown-menu {
+    background-color: var(--dropdown-bg);
+    color: var(--dropdown-text);
+}
+
+.dropdown-item {
+    color: var(--dropdown-text);
+}
+
+.dropdown-item:hover {
+    background-color: var(--navbar-second-bg);
+}
+
+.table {
+    color: var(--text-color);
+    border-color: var(--table-border);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--table-striped);
+}
+
+/* Fix text colors in dark mode */
+[data-theme="dark"] .text-dark {
+    color: #f8f9fa !important;
+}
+
+[data-theme="dark"] .text-body {
+    color: #f8f9fa !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #adb5bd !important;
+}
+
+/* Fix alert colors in dark mode */
+[data-theme="dark"] .alert {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--input-border);
+}
+
+[data-theme="dark"] .alert-success {
+    background-color: rgba(25, 135, 84, 0.2);
+    color: #75b798;
+    border-color: #198754;
+}
+
+[data-theme="dark"] .alert-danger {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #ea868f;
+    border-color: #dc3545;
+}
+
+[data-theme="dark"] .alert-warning {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #ffda6a;
+    border-color: #ffc107;
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(13, 202, 240, 0.2);
+    color: #6edff6;
+    border-color: #0dcaf0;
+}
+
+/* Fix button text colors in dark mode */
+[data-theme="dark"] .btn-outline-dark {
+    color: #f8f9fa;
+    border-color: #f8f9fa;
+}
+
+[data-theme="dark"] .btn-outline-dark:hover {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.navbar-light {
+    background-color: var(--navbar-second-bg) !important;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--navbar-second-text);
+}
+
+footer {
+    background-color: var(--footer-bg) !important;
+}
+
+#theme-toggle {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+#theme-toggle:hover {
+    transform: rotate(30deg);
+}
+
+/* Search Bar Styles */
+.search-bar {
+    position: relative;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.5s ease, padding 0.5s ease;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.search-bar.slide-down {
+    max-height: 100px;
+    opacity: 1;
+    padding: 1rem 0 !important;
+}
+
+.search-form .form-control-lg {
+    font-size: 1.25rem;
+    height: 3rem;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+}
+
+.search-form .btn-link {
+    color: var(--text-color);
+    transition: transform 0.3s ease;
+}
+
+.search-form .btn-link:hover {
+    transform: scale(1.1);
+}
+
+#search-toggle, #search-close {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#search-toggle:hover, #search-close:hover {
+    transform: scale(1.1);
+}
+
+/* Navbar Animation */
+.navbar-nav .nav-link {
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: #fff;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover::after {
+    width: 100%;
+    left: 0;
+}
+
+[data-theme="dark"] .navbar-light .navbar-nav .nav-link::after {
+    background-color: var(--text-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .navbar-collapse.justify-content-center {
+        justify-content: flex-start !important;
+    }
+    
+    .search-bar.slide-down {
+        max-height: 120px;
+    }
+}
+
+/* Custom Colors */
+.btn-primary, .bg-primary {
+    background-color: #2c3e50 !important;
+    border-color: #2c3e50 !important;
+}
+
+.btn-success, .bg-success {
+    background-color: #27ae60 !important;
+    border-color: #27ae60 !important;
+}
+
+.btn-danger, .bg-danger {
+    background-color: #e74c3c !important;
+    border-color: #e74c3c !important;
+}
+
+.btn-outline-primary {
+    color: #2c3e50 !important;
+    border-color: #2c3e50 !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #2c3e50 !important;
+    color: white !important;
+}
+
+.btn-outline-success {
+    color: #27ae60 !important;
+    border-color: #27ae60 !important;
+}
+
+.btn-outline-success:hover {
+    background-color: #27ae60 !important;
+    color: white !important;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.card {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Optional: Ensure body has relative position if needed for absolute positioning inside */
+/* body { position: relative; } */
+
+/* --- Dynamic Search Bar Styles --- */
+#search-bar-container {
+    background-color: #f8f9fa; /* Light grey background */
+    padding: 1rem 0;
+    overflow: hidden; /* Important for max-height transition */
+    max-height: 0; /* Initially hidden */
+    opacity: 0; /* Initially transparent */
+    transition: max-height 0.5s ease-out, opacity 0.4s ease-out, padding 0.5s ease-out; /* Smooth animation */
+    border-bottom: 1px solid #dee2e6; /* Optional border */
+}
+
+.search-active #search-bar-container {
+    opacity: 1; /* Show when active */
+    padding: 1rem 0; /* Restore padding when active */
+    /* max-height is set dynamically via JS */
+}
+
+.search-active #search-toggle-icon {
+    display: none; /* Hide original icon when search is active */
+}
+
+#search-input {
+    border: none;
+    box-shadow: none;
+}
+
+#search-input:focus {
+    box-shadow: none;
+    border: none;
+}
+
+/* Ensure content below doesn't jump abruptly */
+main {
+    transition: margin-top 0.5s ease-out; 
+}
+
+ /* Footer */
+footer {
+    background-color: var(--footer-bg) !important;
+}
