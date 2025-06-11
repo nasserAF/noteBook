@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">نتائج البحث: "{{ query }}"</h5>
+            </div>
+            <div class="card-body">
+                {% if results.todos|length > 0 or results.notes|length > 0 %}
+                
+                {% if results.todos|length > 0 %}
+                <h5 class="mt-3 mb-3">المهام ({{ results.todos|length }})</h5>
+                <div class="table-responsive mb-4">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>المهمة</th>
+                                <th>التفاصيل</th>
+                                <th>التاريخ</th>
+                                <th>الأولوية</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for todo in results.todos %}
+                            <tr class="{% if todo.completed %}table-success{% endif %}">
+                                <td>{{ todo.title }}</td>
+                                <td>{{ todo.details }}</td>
+                                <td>{{ todo.date }}</td>
+                                <td>
+                                    {% if todo.priority == 'high' %}
+                                    <span class="badge bg-danger">عالية</span>
+                                    {% elif todo.priority == 'medium' %}
+                                    <span class="badge bg-warning text-dark">متوسطة</span>
+                                    {% else %}
+                                    <span class="badge bg-info text-dark">منخفضة</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if todo.completed %}
+                                    <span class="badge bg-success">مكتملة</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">قيد التنفيذ</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('todos') }}" class="btn btn-sm btn-primary">عرض</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                
+                {% if results.notes|length > 0 %}
+                <h5 class="mt-3 mb-3">الملاحظات ({{ results.notes|length }})</h5>
+                <div class="row">
+                    {% for note in results.notes %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 note-card">
+                            {% if note.images and note.images|length > 0 %}
+                            <div class="note-image-container">
+                                <img src="{{ note.images[0] }}" class="card-img-top note-image" alt="{{ note.title }}">
+                                {% if note.images|length > 1 %}
+                                <span class="badge bg-primary more-images-badge">+{{ note.images|length - 1 }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ note.title }}</h5>
+                                <p class="card-text text-muted small">{{ note.date }}</p>
+                                <p class="card-text note-details">{{ note.details|truncate(100) }}</p>
+                                
+                                {% if note.tags and note.tags|length > 0 %}
+                                <div class="mt-2">
+                                    {% for tag in note.tags %}
+                                    <span class="badge bg-secondary me-1">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <a href="{{ url_for('view_note', note_id=note.id) }}" class="btn btn-sm btn-outline-primary">عرض</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-4x mb-3 text-muted"></i>
+                    <h5>لم يتم العثور على نتائج</h5>
+                    <p>جرب البحث بكلمات مختلفة</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">العودة إلى الرئيسية</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

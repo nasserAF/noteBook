@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طباعة: {{ note.title }}</title>
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.rtl.min.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}">
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            background-color: white;
+            color: #000;
+            line-height: 1.6;
+            font-size: 22px;
+        }
+        
+        .print-container {
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .print-header {
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .print-title {
+            font-size: 24pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #000;
+        }
+        
+        .print-date {
+            font-size: 12pt;
+            color: #000;
+            margin-bottom: 20px;
+            display: none; /* إخفاء التاريخ */
+        }
+        
+        .print-details {
+            margin-bottom: 20px;
+        }
+        
+        .print-section-title {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #000;
+            padding-bottom: 5px;
+        }
+        
+        .print-tags span {
+            display: inline-block;
+            background-color: #f0f0f0;
+            padding: 3px 8px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border-radius: 3px;
+            font-size: 10pt;
+        }
+        
+        .print-links a {
+            color: #000;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        .print-footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 22px;
+            color: #000;
+            border-top: 1px solid #000;
+            padding-top: 15px;
+        }
+        
+        .print-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+        
+        .print-images-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .print-image-item {
+            width: 30%;
+            page-break-inside: avoid;
+        }
+        
+        .print-file-item {
+            margin-bottom: 8px;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            a {
+                text-decoration: none !important;
+                color: #333 !important;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container print-container">
+        <!-- Print Controls - Only visible on screen -->
+        <div class="no-print mb-3 mt-3 d-flex justify-content-between">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> طباعة
+            </button>
+            <button class="btn btn-secondary" onclick="window.close()">
+                <i class="fas fa-times me-1"></i> إغلاق
+            </button>
+        </div>
+        
+        <!-- Note Content -->
+        <div class="print-header">
+            <h1 class="print-title">{{ note.title }}</h1>
+            <div class="print-date">
+                <i class="far fa-calendar-alt me-1"></i> {{ note.date }}
+            </div>
+        </div>
+        
+        <!-- Details Section -->
+        <div class="print-details">
+            <h2 class="print-section-title">التفاصيل</h2>
+            <div>{{ note.details|safe }}</div>
+        </div>
+        
+        <!-- Tags Section -->
+        {% if note.tags and note.tags|length > 0 %}
+        <div class="print-tags">
+            <h2 class="print-section-title">العلامات</h2>
+            <div>
+                {% for tag in note.tags %}
+                <span>{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Links Section -->
+        {% if note.links and note.links|length > 0 %}
+        <div class="print-links">
+            <h2 class="print-section-title">الروابط</h2>
+            <ul>
+                {% for link in note.links %}
+                <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Images Section -->
+        {% set image_attachments = note.attachments | selectattr('type', 'equalto', 'image') | list %}
+        {% if image_attachments|length > 0 %}
+        <div class="print-images">
+            <h2 class="print-section-title">الصور</h2>
+            <div class="print-images-container">
+                {% for image in image_attachments %}
+                <div class="print-image-item">
+                    <img src="{{ image.url }}" alt="{{ image.filename }}" class="print-image img-fluid">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Other Attachments Section -->
+        {% set other_attachments = note.attachments | rejectattr('type', 'equalto', 'image') | list %}
+        {% if other_attachments|length > 0 %}
+        <div class="print-files">
+            <h2 class="print-section-title">الملفات المرفقة</h2>
+            <ul class="list-unstyled">
+                {% for attachment in other_attachments %}
+                <li class="print-file-item">
+                    {% if attachment.filename.endswith('.pdf') %}
+                        <i class="fas fa-file-pdf me-2"></i>
+                    {% elif attachment.filename.endswith('.doc') or attachment.filename.endswith('.docx') %}
+                        <i class="fas fa-file-word me-2"></i>
+                    {% elif attachment.filename.endswith('.xls') or attachment.filename.endswith('.xlsx') %}
+                        <i class="fas fa-file-excel me-2"></i>
+                    {% elif attachment.filename.endswith('.ppt') or attachment.filename.endswith('.pptx') %}
+                        <i class="fas fa-file-powerpoint me-2"></i>
+                    {% elif attachment.filename.endswith('.txt') %}
+                        <i class="fas fa-file-alt me-2"></i>
+                    {% else %}
+                        <i class="fas fa-file me-2"></i>
+                    {% endif %}
+                    {{ attachment.filename }} - <a href="{{ attachment.url }}" target="_blank">{{ attachment.url }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Footer -->
+        <div class="print-footer">
+            <p>تم إنشاؤه بواسطة تطبيق يلا تاسكات - {{ now.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+    </div>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        // Auto-print when page loads (optional - can be removed if you prefer manual printing)
+        window.onload = function() {
+            // Uncomment the line below if you want automatic print dialog
+            // setTimeout(function() { window.print(); }, 1000);
+        };
+    </script>
+</body>
+</html>

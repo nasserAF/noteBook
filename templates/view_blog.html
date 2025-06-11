@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}{{ blog.title }} - يلا تاسكات{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('blogs') }}">المدونات</a></li>
+            <li class="breadcrumb-item active" aria-current="page">عرض المقالة</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0">{{ blog.title }}</h2>
+                    <span class="badge bg-light text-dark">{{ blog.blog_name }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        {{ blog.content|replace('\n', '<br>')|safe }}
+                    </div>
+
+                    {% if blog.keywords %}
+                    <div class="mb-3">
+                        <h5>الكلمات المفتاحية:</h5>
+                        <div>
+                            {% for keyword in blog.keywords %}
+                                <span class="badge bg-primary me-1 mb-1">{{ keyword }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if blog.sub_keywords %}
+                    <div class="mb-3">
+                        <h5>كلمات مفتاحية فرعية:</h5>
+                        <div>
+                            {% for sub_keyword in blog.sub_keywords %}
+                                <span class="badge bg-secondary me-1 mb-1">{{ sub_keyword }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if blog.tags %}
+                    <div class="mb-3">
+                        <h5>الوسوم:</h5>
+                        <div>
+                            {% for tag in blog.tags %}
+                                <span class="badge bg-info text-dark me-1 mb-1">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if blog.meta_descriptions %}
+                    <div class="mb-3">
+                        <h5>وصف الميتا:</h5>
+                        <ul class="list-unstyled">
+                            {% for desc in blog.meta_descriptions %}
+                                <li class="mb-2">{{ desc }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if blog.permalinks %}
+                    <div class="mb-3">
+                        <h5>الروابط الدائمة:</h5>
+                        <ul class="list-unstyled">
+                            {% for link in blog.permalinks %}
+                                <li class="mb-2">
+                                    <a href="{{ link }}" target="_blank" class="text-decoration-none">
+                                        <i class="fas fa-external-link-alt me-1"></i> {{ link }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <small class="text-muted">
+                                <i class="far fa-calendar-alt me-1"></i>
+                                تم التحديث: {{ blog.updated_at.strftime('%Y-%m-%d %H:%M') if blog.updated_at else 'غير معروف' }}
+                            </small>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('edit_blog', blog_id=blog.id) }}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="fas fa-edit me-1"></i> تعديل
+                            </a>
+                            <a href="{{ url_for('blogs') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-arrow-right me-1"></i> العودة للقائمة
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

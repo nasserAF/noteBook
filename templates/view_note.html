@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    /* Style carousel icons: white with black outline simulation */
+    #noteImageCarousel button.carousel-control-prev span.carousel-control-prev-icon,
+    #noteImageCarousel button.carousel-control-next span.carousel-control-next-icon {
+        filter: invert(1) grayscale(100); /* Make icon white */
+        /* Simulate black stroke using text-shadow */
+        text-shadow: 
+            -1px -1px 0 #000,  
+             1px -1px 0 #000,
+            -1px  1px 0 #000,
+             1px  1px 0 #000;
+        /* Optional: Increase icon size slightly */
+        /* width: 2.5rem; */
+        /* height: 2.5rem; */
+    }
+
+    /* Adjust icon size slightly if needed within the circle */
+    /* #noteImageCarousel .carousel-control-prev-icon,
+       #noteImageCarousel .carousel-control-next-icon {
+        width: 1.5rem; 
+        height: 1.5rem;
+    } */
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ note.title }}</h5>
+                <div>
+                    <a href="{{ url_for('edit_note', note_id=note.id) }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-edit me-1"></i> تعديل
+                    </a>
+                    <a href="{{ url_for('print_note', note_id=note.id) }}" class="btn btn-sm btn-light ms-2" target="_blank">
+                        <i class="fas fa-print me-1"></i> طباعة
+                    </a>
+                    <a href="{{ url_for('notes') }}" class="btn btn-sm btn-light ms-2">
+                        <i class="fas fa-arrow-right me-1"></i> العودة
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <p class="text-muted">
+                        <i class="far fa-calendar-alt me-1"></i> {{ note.date }}
+                    </p>
+                </div>
+                
+                {% if note.images and note.images|length > 0 %}
+                <div class="mb-4">
+                    <div id="noteImagesCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in note.images %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="{{ image }}" class="d-block w-100 note-full-image" alt="صورة">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if note.images|length > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#noteImagesCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">السابق</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#noteImagesCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">التالي</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if note.attachments and note.attachments|length > 0 %}
+                <!-- Image Carousel Section -->
+                {% set image_attachments = note.attachments | selectattr('type', 'equalto', 'image') | list %}
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">الصور:</h6>
+                    {% if image_attachments|length > 0 %}
+                        <div id="noteImageCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-indicators">
+                                {% for image in image_attachments %}
+                                    <button type="button" data-bs-target="#noteImageCarousel" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ loop.index }}"></button>
+                                {% endfor %}
+                            </div>
+                            <div class="carousel-inner">
+                                {% for image in image_attachments %}
+                                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                        <img src="{{ image.url }}" class="d-block w-100 rounded" alt="{{ image.filename }}" style="max-height: 400px; object-fit: contain;">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if image_attachments|length > 1 %}
+                                <button class="carousel-control-prev" type="button" data-bs-target="#noteImageCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#noteImageCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p>لا توجد صور مرفقة.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <!-- Other Attachments Section -->
+                {% set other_attachments = note.attachments | rejectattr('type', 'equalto', 'image') | list %}
+                {% if other_attachments|length > 0 %}
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">ملفات أخرى:</h6>
+                    <ul class="list-group list-group-flush">
+                        {% for attachment in other_attachments %}
+                            <li class="list-group-item">
+                                <a href="{{ attachment.url }}" target="_blank">
+                                    {% if attachment.filename.endswith('.pdf') %}
+                                        <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    {% elif attachment.filename.endswith('.doc') or attachment.filename.endswith('.docx') %}
+                                        <i class="fas fa-file-word me-2 text-primary"></i>
+                                    {% elif attachment.filename.endswith('.xls') or attachment.filename.endswith('.xlsx') %}
+                                        <i class="fas fa-file-excel me-2 text-success"></i>
+                                    {% elif attachment.filename.endswith('.ppt') or attachment.filename.endswith('.pptx') %}
+                                        <i class="fas fa-file-powerpoint me-2 text-warning"></i>
+                                    {% elif attachment.filename.endswith('.txt') %}
+                                        <i class="fas fa-file-alt me-2 text-muted"></i>
+                                    {% else %}
+                                        <i class="fas fa-file me-2 text-secondary"></i>
+                                    {% endif %}
+                                    {{ attachment.filename }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">التفاصيل:</h6>
+                    <div class="note-full-details">
+                        {{ note.details|safe }}
+                    </div>
+                </div>
+                
+                {% if note.tags and note.tags|length > 0 %}
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">العلامات:</h6>
+                    <div>
+                        {% for tag in note.tags %}
+                        <span class="badge bg-secondary me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if note.links and note.links|length > 0 %}
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">الروابط:</h6>
+                    <ul class="list-group">
+                        {% for link in note.links %}
+                        <li class="list-group-item">
+                            <a href="{{ link }}" target="_blank" rel="noopener noreferrer">{{ link }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ url_for('notes') }}" class="btn btn-secondary">العودة إلى الملاحظات</a>
+                    <div>
+                        <a href="{{ url_for('print_note', note_id=note.id) }}" class="btn btn-info me-2" target="_blank">
+                            <i class="fas fa-print me-1"></i> طباعة
+                        </a>
+                        <a href="{{ url_for('edit_note', note_id=note.id) }}" class="btn btn-warning me-2"> 
+                            <i class="fas fa-edit me-1"></i> تعديل
+                        </a>
+                        <a href="{{ url_for('delete_note', note_id=note.id) }}" class="btn btn-danger" 
+                           onclick="return confirm('هل أنت متأكد من حذف هذه الملاحظة؟');">
+                            <i class="fas fa-trash me-1"></i> حذف
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

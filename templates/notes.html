@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">الأفكار والملاحظات</h5>
+                <a href="{{ url_for('add_note') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-plus me-1"></i> إضافة فكرة/ملاحظة جديدة
+                </a>
+                <a href="{{ url_for('archived_notes') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-archive me-1"></i> عرض الأرشيف
+                </a>
+            </div>
+            <div class="card-body">
+                {% if notes %}
+                <div class="row">
+                    {% for note in notes %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 note-card shadow-sm overflow-hidden">
+                            {% set cover_image = note.cover_image_url or (note.images[0] if note.images) or url_for('static', filename='images/default-note-bg.jpg') %}
+                            <div class="note-cover-image" style="background-image: url('{{ cover_image }}');">
+                                <h5 class="card-title note-cover-title">{{ note.title }}</h5>
+                            </div>
+                            <div class="card-body pt-2">
+                                <p class="card-text text-muted small mb-1">{{ note.date }}</p>
+                                {% if note.attachments and note.attachments|length > 0 %}
+                                <i class="fas fa-paperclip text-muted small me-2" title="يحتوي على مرفقات"></i>
+                                {% endif %}
+                                {% if note.images and note.images|length > 0 and (note.images|length > 1 or not note.cover_image_url) %}
+                                <span class="badge bg-dark text-white small me-2"><i class="fas fa-images me-1"></i>{{ note.images|length }}</span>
+                                {% endif %}
+                                <!-- Render truncated HTML details safely -->
+                                <div class="card-text note-details mt-2">{{ note.details|striptags|truncate(80) }}</div> 
+                                {# Alternatively, to show formatted excerpt (might break layout): <div class="card-text note-details">{{ note.details|safe|truncate(100, True, '...') }}</div> #}
+                                {% if note.tags and note.tags|length > 0 %}
+                                <div class="mt-2">
+                                    {% for tag in note.tags %}
+                                    <span class="badge bg-secondary me-1">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                                <a href="{{ url_for('view_note', note_id=note.id) }}" class="btn btn-sm btn-outline-primary" title="عرض التفاصيل">عرض</a>
+                                <div>
+                                    <a href="{{ url_for('todos', note_id=note.id) }}" class="btn btn-sm btn-outline-success" title="إنشاء مهمة من هذه الملاحظة">
+                                        <i class="fas fa-check-square"></i>
+                                    </a>
+                                    <a href="{{ url_for('edit_note', note_id=note.id) }}" class="btn btn-sm btn-outline-secondary" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('archive_note', note_id=note.id) }}" class="btn btn-sm btn-outline-warning" title="أرشفة"
+                                       onclick="return confirm('هل أنت متأكد من أرشفة هذه الملاحظة؟');">
+                                        <i class="fas fa-archive"></i>
+                                    </a>
+                                    <a href="{{ url_for('delete_note', note_id=note.id) }}" class="btn btn-sm btn-outline-danger" title="حذف"
+                                       onclick="return confirm('هل أنت متأكد من حذف هذه الملاحظة؟');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-lightbulb fa-4x mb-3 text-muted"></i>
+                    <h5>لا توجد ملاحظات حالياً</h5>
+                    <p>قم بإضافة ملاحظات وأفكار جديدة للبدء</p>
+                    <a href="{{ url_for('add_note') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-1"></i> إضافة فكرة/ملاحظة جديدة
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

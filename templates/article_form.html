@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'تعديل' if article else 'إضافة' }} مقالة - {{ blog.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('blogs') }}">المدونات</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('view_blog', blog_id=blog.id) }}">{{ blog.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'تعديل' if article else 'إضافة' }} مقالة</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{{ 'تعديل' if article else 'إضافة' }} مقالة في {{ blog.name }}</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('edit_article', blog_id=blog.id, article_id=article.id) if article else url_for('add_article', blog_id=blog.id) }}" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">عنوان المقالة <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" required
+                                   value="{{ article.title if article else '' }}">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label for="final_content" class="form-label">النص النهائي <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="final_content" name="final_content" rows="15" required>{{ article.final_content if article and article.final_content else article.content if article else '' }}</textarea>
+                    <div class="form-text">هذا هو المحتوى الذي سيظهر للزوار.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="new_suggestion_text" class="form-label">إضافة نص مقترح</label>
+                    <div class="input-group">
+                        <textarea class="form-control" id="new_suggestion_text" rows="3" placeholder="اكتب النص المقترح هنا..."></textarea>
+                        <button class="btn btn-outline-success" type="button" id="add_suggestion_btn">
+                            <i class="fas fa-plus"></i> إضافة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">قائمة النصوص المقترحة:</label>
+                    <div id="suggestions_list" class="list-group" data-initial-suggestions='{{ article.suggested_content|tojson|safe if article and article.suggested_content else "[]" }}'>
+                        <!-- Suggestions will be added here by JavaScript -->
+                    </div>
+                    <div id="no_suggestions_msg" class="text-muted small mt-2">لا توجد نصوص مقترحة بعد.</div>
+                </div>
+
+                <input type="hidden" id="suggested_content_hidden" name="suggested_content">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="keywords" class="form-label">الكلمات المفتاحية الرئيسية</label>
+                            <input type="text" class="form-control" id="keywords" name="keywords" 
+                                   placeholder="أدخل الكلمات مفصولة بفاصلة"
+                                   value="{{ article.keywords|join(', ') if article and article.keywords else '' }}">
+                            <div class="form-text">الكلمات المفتاحية التي تصف المقالة بشكل رئيسي</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="sub_keywords" class="form-label">الكلمات المفتاحية الفرعية</label>
+                            <input type="text" class="form-control" id="sub_keywords" name="sub_keywords" 
+                                   placeholder="أدخل الكلمات مفصولة بفاصلة"
+                                   value="{{ article.sub_keywords|join(', ') if article and article.sub_keywords else '' }}">
+                            <div class="form-text">كلمات مفتاحية إضافية للمقالة</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">الوسوم</label>
+                            <input type="text" class="form-control" id="tags" name="tags" 
+                                   placeholder="أدخل الوسوم مفصولة بفاصلة"
+                                   value="{{ article.tags|join(', ') if article and article.tags else '' }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="featured_image" class="form-label">صورة المقالة الرئيسية</label>
+                            <input type="text" class="form-control" id="featured_image" name="featured_image"
+                                   placeholder="رابط الصورة"
+                                   value="{{ article.featured_image if article and article.featured_image else '' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="meta_descriptions" class="form-label">أوصاف الميتا</label>
+                    <textarea class="form-control" id="meta_descriptions" name="meta_descriptions" 
+                              rows="3" placeholder="أدخل وصف ميتا واحد في كل سطر">
+                        {{- '\n'.join(article.meta_descriptions) if article and article.meta_descriptions else '' -}}
+                    </textarea>
+                    <div class="form-text">يستخدم لمحركات البحث، من الأفضل أن يكون بين 150-160 حرفاً</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="permalinks" class="form-label">الروابط الدائمة</label>
+                    <textarea class="form-control" id="permalinks" name="permalinks" 
+                              rows="2" placeholder="أدخل رابطاً واحداً في كل سطر">
+                        {{- '\n'.join(article.permalinks) if article and article.permalinks else '' -}}
+                    </textarea>
+                    <div class="form-text">روابط دائمة للمقالة (URLs)</div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ url_for('view_blog', blog_id=blog.id) }}" class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i> إلغاء
+                    </a>
+                    <button type="submit" name="submit" value="save" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> {{ 'تحديث' if article else 'حفظ' }} المقالة
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // --- Logic for Suggested Content ---
+        const suggestionsList = $('#suggestions_list');
+        const newSuggestionText = $('#new_suggestion_text');
+        const addSuggestionBtn = $('#add_suggestion_btn');
+        const hiddenInput = $('#suggested_content_hidden');
+        const noSuggestionsMsg = $('#no_suggestions_msg');
+
+        let suggestions = [];
+
+        function updateSuggestionsUI() {
+            suggestionsList.empty();
+            if (suggestions.length === 0) {
+                noSuggestionsMsg.show();
+            } else {
+                noSuggestionsMsg.hide();
+                suggestions.forEach((text, index) => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = text;
+                    const plainText = tempDiv.textContent || tempDiv.innerText || "";
+                    const displayText = plainText.length > 100 ? plainText.substring(0, 100) + '...' : plainText;
+                    
+                    const listItem = $(`
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="flex-grow-1 me-3" title="${plainText}">مقترح #${index + 1}: ${displayText}</span>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-suggestion-btn" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `);
+                    suggestionsList.append(listItem);
+                });
+            }
+            hiddenInput.val(suggestions.join('|||---|||'));
+        }
+
+        // Safely load existing suggestions from data attribute
+        try {
+            const initialSuggestionsRaw = suggestionsList.attr('data-initial-suggestions');
+            if (initialSuggestionsRaw) {
+                const initialSuggestions = JSON.parse(initialSuggestionsRaw);
+                if (Array.isArray(initialSuggestions)) {
+                    suggestions = initialSuggestions;
+                }
+            }
+        } catch (e) {
+            console.error("Failed to parse initial suggestions:", e);
+            suggestions = []; // Fallback to empty array on error
+        }
+        updateSuggestionsUI();
+
+        // Add new suggestion
+        addSuggestionBtn.on('click', function() {
+            const text = newSuggestionText.val().trim();
+            if (text) {
+                suggestions.push(text);
+                newSuggestionText.val('');
+                updateSuggestionsUI();
+            }
+        });
+
+        // Remove a suggestion
+        suggestionsList.on('click', '.remove-suggestion-btn', function() {
+            const index = $(this).data('index');
+            suggestions.splice(index, 1);
+            updateSuggestionsUI();
+        });
+
+        // Ensure the hidden field is updated just before form submission
+        $('form').on('submit', function() {
+            hiddenInput.val(suggestions.join('|||---|||'));
+        });
+
+        // --- Initialize Summernote ---
+        $('#final_content').summernote({
+            height: 400,
+            lang: 'ar-AR',
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ],
+            direction: 'rtl'
+        });
+
+        // Initialize tag inputs
+        const tagsInput = document.querySelector('#tags');
+        if(tagsInput) new Tagify(tagsInput);
+
+        const keywordsInput = document.querySelector('#keywords');
+        if(keywordsInput) new Tagify(keywordsInput);
+
+        const subKeywordsInput = document.querySelector('#sub_keywords');
+        if(subKeywordsInput) new Tagify(subKeywordsInput);
+    });
+</script>
+{% endblock %}

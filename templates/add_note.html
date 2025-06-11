@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">إضافة فكرة/ملاحظة جديدة</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('add_note') }}" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">العنوان</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="details" class="form-label">التفاصيل</label>
+                        <!-- Changed textarea to use Summernote -->
+                        <textarea class="form-control" id="summernote-details" name="details" rows="5" required>{{ request.form['details'] }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">العلامات (مفصولة بفواصل)</label>
+                        <input type="text" class="form-control" id="tags" name="tags" placeholder="مثال: تعليم، تطوير، فكرة">
+                        <div class="form-text">أدخل العلامات مفصولة بفواصل لتسهيل البحث لاحقاً</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="links" class="form-label">الروابط (مفصولة بفواصل)</label>
+                        <input type="text" class="form-control" id="links" name="links" placeholder="مثال: https://example.com, https://another-site.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="attachments" class="form-label">المرفقات (صور، PDF, مستندات, إلخ)</label>
+                        <input class="form-control" type="file" id="attachments" name="attachments" multiple accept=".png,.jpg,.jpeg,.gif,.pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                        <div class="form-text">يمكنك اختيار صورة واحدة أو أكثر</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('notes') }}" class="btn btn-secondary">إلغاء</a>
+                        <button type="submit" class="btn btn-success">حفظ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

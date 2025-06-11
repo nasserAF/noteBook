@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">قائمة المهام</h5>
+                <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addTodoModal">
+                    <i class="fas fa-plus me-1"></i> إضافة مهمة جديدة
+                </button>
+            </div>
+            <div class="card-body">
+                {% if todos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>المهمة</th>
+                                <th>التفاصيل</th>
+                                <th>التاريخ</th>
+                                <th>الأولوية</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for todo in todos %}
+                            <tr class="{% if todo.completed %}table-success{% endif %}">
+                                <td>{{ todo.title }}</td>
+                                <td>{{ todo.details }}</td>
+                                <td>{{ todo.date }}</td>
+                                <td>
+                                    {% if todo.priority == 'high' %}
+                                    <span class="badge bg-danger">عالية</span>
+                                    {% elif todo.priority == 'medium' %}
+                                    <span class="badge bg-warning text-dark">متوسطة</span>
+                                    {% else %}
+                                    <span class="badge bg-info text-dark">منخفضة</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if todo.completed %}
+                                    <span class="badge bg-success">مكتملة</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">قيد التنفيذ</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        {% if not todo.completed %}
+                                        <a href="{{ url_for('complete_todo', todo_id=todo.id) }}" class="btn btn-sm btn-success" title="إكمال">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-primary edit-todo" title="تعديل"
+                                                data-id="{{ todo.id }}" data-title="{{ todo.title }}" 
+                                                data-details="{{ todo.details }}" data-priority="{{ todo.priority }}"
+                                                data-bs-toggle="modal" data-bs-target="#editTodoModal">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        {% endif %}
+                                        <a href="{{ url_for('delete_todo', todo_id=todo.id) }}" class="btn btn-sm btn-danger" 
+                                           onclick="return confirm('هل أنت متأكد من حذف هذه المهمة؟');" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-tasks fa-4x mb-3 text-muted"></i>
+                    <h5>لا توجد مهام حالياً</h5>
+                    <p>قم بإضافة مهام جديدة للبدء</p>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTodoModal">
+                        <i class="fas fa-plus me-1"></i> إضافة مهمة جديدة
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Todo Modal -->
+<div class="modal fade" id="addTodoModal" tabindex="-1" aria-labelledby="addTodoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addTodoModalLabel">إضافة مهمة جديدة</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('add_todo') }}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">عنوان المهمة</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="details" class="form-label">التفاصيل</label>
+                        <textarea class="form-control" id="details" name="details" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">الأولوية</label>
+                        <select class="form-select" id="priority" name="priority">
+                            <option value="low">منخفضة</option>
+                            <option value="medium">متوسطة</option>
+                            <option value="high">عالية</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">إضافة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Todo Modal -->
+<div class="modal fade" id="editTodoModal" tabindex="-1" aria-labelledby="editTodoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editTodoModalLabel">تعديل المهمة</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editTodoForm" action="" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit-title" class="form-label">عنوان المهمة</label>
+                        <input type="text" class="form-control" id="edit-title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-details" class="form-label">التفاصيل</label>
+                        <textarea class="form-control" id="edit-details" name="details" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-priority" class="form-label">الأولوية</label>
+                        <select class="form-select" id="edit-priority" name="priority">
+                            <option value="low">منخفضة</option>
+                            <option value="medium">متوسطة</option>
+                            <option value="high">عالية</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle edit todo button clicks
+        const editButtons = document.querySelectorAll('.edit-todo');
+        const editTodoForm = document.getElementById('editTodoForm');
+        const editTitleInput = document.getElementById('edit-title');
+        const editDetailsInput = document.getElementById('edit-details');
+        const editPrioritySelect = document.getElementById('edit-priority');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const todoId = this.getAttribute('data-id');
+                const todoTitle = this.getAttribute('data-title');
+                const todoDetails = this.getAttribute('data-details');
+                const todoPriority = this.getAttribute('data-priority');
+                
+                if (editTitleInput) editTitleInput.value = todoTitle;
+                if (editDetailsInput) editDetailsInput.value = todoDetails;
+                if (editPrioritySelect) editPrioritySelect.value = todoPriority;
+                
+                if (editTodoForm) editTodoForm.action = `/update_todo/${todoId}`;
+            });
+        });
+
+        // --- Add code for prefilling and opening the Add Todo Modal ---
+        {% if prefill_data %}
+        const addTodoModalElement = document.getElementById('addTodoModal');
+        const addTodoModal = new bootstrap.Modal(addTodoModalElement);
+        const addTitleInput = document.getElementById('title');
+        const addDetailsInput = document.getElementById('details');
+        
+        if (addTitleInput) addTitleInput.value = {{ prefill_data.title | tojson }};
+        if (addDetailsInput) addDetailsInput.value = {{ prefill_data.details | tojson }};
+        
+        // Set default priority if needed, or maybe select medium?
+        // document.getElementById('priority').value = 'medium'; 
+
+        // Open the modal
+        if (addTodoModal) {
+            addTodoModal.show();
+        }
+        {% endif %}
+        // --- End of added code ---
+    });
+</script>
+{% endblock %}

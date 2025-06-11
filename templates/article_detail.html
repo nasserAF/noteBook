@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - {{ blog.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('blogs') }}">المدونات</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('view_blog', blog_id=blog.id) }}">{{ blog.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ article.title|truncate(30) }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ article.title }}</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('edit_article', blog_id=blog.id, article_id=article.id) }}" 
+               class="btn btn-outline-primary">
+                <i class="fas fa-edit"></i> تعديل
+            </a>
+            <a href="{{ url_for('view_blog', blog_id=blog.id) }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-right"></i> العودة للمقالات
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="mb-4">
+                <h4>المحتوى</h4>
+                <div class="article-content">
+                    {{ article.final_content|safe if article.final_content else article.content|safe }}
+                </div>
+            </div>
+
+            {% if article.suggested_content %}
+            <hr>
+            <div class="mb-4">
+                <h4><i class="fas fa-lightbulb me-2"></i>النصوص المقترحة</h4>
+                <div class="list-group">
+                    {% for suggestion in article.suggested_content %}
+                        <button type="button" class="list-group-item list-group-item-action view-suggestion-btn" data-bs-toggle="modal" data-bs-target="#suggestionModal" data-suggestion-text="{{ suggestion|e }}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">مقترح #{{ loop.index }}</h6>
+                            </div>
+                            <p class="mb-1 small text-muted">{{ suggestion|striptags|truncate(120) }}</p>
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if article.keywords %}
+            <div class="mb-4">
+                <h5>الكلمات المفتاحية:</h5>
+                <div>
+                    {% for keyword in article.keywords %}
+                        <span class="badge bg-primary me-1 mb-1">{{ keyword }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if article.sub_keywords %}
+            <div class="mb-4">
+                <h5>كلمات مفتاحية فرعية:</h5>
+                <div>
+                    {% for keyword in article.sub_keywords %}
+                        <span class="badge bg-secondary me-1 mb-1">{{ keyword }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if article.tags %}
+            <div class="mb-4">
+                <h5>الوسوم:</h5>
+                <div>
+                    {% for tag in article.tags %}
+                        <span class="badge bg-info text-dark me-1 mb-1">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if article.meta_descriptions %}
+            <div class="mb-4">
+                <h5>أوصاف الميتا:</h5>
+                <ul class="list-group">
+                    {% for desc in article.meta_descriptions %}
+                        <li class="list-group-item">{{ desc }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if article.permalinks %}
+            <div class="mb-4">
+                <h5>الروابط الدائمة:</h5>
+                <div class="list-group">
+                    {% for link in article.permalinks %}
+                        <a href="{{ link }}" target="_blank" class="list-group-item list-group-item-action">
+                            <i class="fas fa-external-link-alt me-2"></i>{{ link }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="text-muted small mt-4">
+                <div>تاريخ الإنشاء: {{ article.created_at.strftime('%Y-%m-%d %H:%M') if article.created_at else 'غير معروف' }}</div>
+                {% if article.updated_at %}
+                    <div>آخر تحديث: {{ article.updated_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-footer bg-transparent">
+            <form action="{{ url_for('delete_article', blog_id=blog.id, article_id=article.id) }}" 
+                  method="POST" class="d-inline" 
+                  onsubmit="return confirm('هل أنت متأكد من حذف هذه المقالة؟')">
+                <button type="submit" class="btn btn-outline-danger">
+                    <i class="fas fa-trash"></i> حذف المقالة
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Suggested Content -->
+<div class="modal fade" id="suggestionModal" tabindex="-1" aria-labelledby="suggestionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="suggestionModalLabel">عرض النص المقترح</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="suggestionModalBody">
+                <!-- Suggestion text will be injected here by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const suggestionModal = document.getElementById('suggestionModal');
+    if (suggestionModal) {
+        suggestionModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const suggestionText = button.getAttribute('data-suggestion-text');
+            const modalBody = suggestionModal.querySelector('.modal-body');
+            
+            // Render the HTML content from Summernote safely
+            modalBody.innerHTML = suggestionText;
+        });
+    }
+});
+</script>
+{% endblock %}

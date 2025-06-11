@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h1 class="display-4 mb-4">مرحباً بك في تطبيق يلا تاسكات</h1>
+                <p class="lead">تطبيق بسيط لإدارة المهام والملاحظات الخاصة بك</p>
+                
+                <div class="row mt-5">
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-tasks fa-4x mb-3 text-primary"></i>
+                                <h3 class="card-title">قائمة المهام</h3>
+                                <p class="card-text">سجل مهامك اليومية مع تفاصيلها وأولوياتها وتواريخها</p>
+                                <a href="{{ url_for('todos') }}" class="btn btn-primary">استعرض المهام</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-success">
+                            <div class="card-body text-center">
+                                <i class="fas fa-lightbulb fa-4x mb-3 text-success"></i>
+                                <h3 class="card-title">الأفكار والملاحظات</h3>
+                                <p class="card-text">سجل أفكارك وملاحظاتك مع إمكانية إضافة صور وروابط وعلامات</p>
+                                <a href="{{ url_for('notes') }}" class="btn btn-success">استعرض الملاحظات</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-5">
+                    <h4>مميزات التطبيق</h4>
+                    <div class="row mt-3">
+                        <div class="col-md-4 mb-3">
+                            <div class="feature-box">
+                                <i class="fas fa-mobile-alt fa-2x mb-2 text-muted"></i>
+                                <h5>متوافق مع الأجهزة المحمولة</h5>
+                                <p>يعمل على جميع الأجهزة بتصميم متجاوب</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="feature-box">
+                                <i class="fas fa-cloud fa-2x mb-2 text-muted"></i>
+                                <h5>تخزين آمن للبيانات</h5>
+                                <p>حفظ البيانات على Firestore بشكل آمن</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="feature-box">
+                                <i class="fas fa-search fa-2x mb-2 text-muted"></i>
+                                <h5>بحث سريع</h5>
+                                <p>ابحث في المهام والملاحظات بسهولة</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

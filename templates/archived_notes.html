@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}الملاحظات المؤرشفة - يلا تاسكات{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-archive me-2"></i>الملاحظات المؤرشفة</h5>
+                <a href="{{ url_for('notes') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> العودة إلى الملاحظات النشطة
+                </a>
+            </div>
+            <div class="card-body">
+                {% if notes %}
+                <div class="row">
+                    {% for note in notes %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 note-card bg-light">
+                            {% if note.images and note.images|length > 0 %}
+                            <div class="note-image-container">
+                                <img src="{{ note.images[0] }}" class="card-img-top note-image" alt="{{ note.title }}" style="opacity: 0.7;">
+                                {% if note.images|length > 1 %}
+                                <span class="badge bg-primary more-images-badge">+{{ note.images|length - 1 }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ note.title }}</h5>
+                                <p class="card-text text-muted small">{{ note.date }}</p>
+                                <p class="card-text note-details">{{ note.details|truncate(100) }}</p>
+                                
+                                {% if note.tags and note.tags|length > 0 %}
+                                <div class="mt-2">
+                                    {% for tag in note.tags %}
+                                    <span class="badge bg-secondary me-1">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                                <!-- View Button (Optional for Archived) -->
+                                <a href="{{ url_for('view_note', note_id=note.id) }}" class="btn btn-sm btn-outline-secondary" title="عرض التفاصيل">عرض</a> 
+                                <div>
+                                    <!-- Unarchive Button -->
+                                    <a href="{{ url_for('unarchive_note', note_id=note.id) }}" class="btn btn-sm btn-outline-success" title="استعادة الأرشيف">
+                                        <i class="fas fa-box-open"></i>
+                                    </a>
+                                    <!-- Permanent Delete Button (Optional) -->
+                                    <a href="{{ url_for('delete_note', note_id=note.id) }}" class="btn btn-sm btn-outline-danger" title="حذف نهائي"
+                                       onclick="return confirm('هل أنت متأكد من حذف هذه الملاحظة نهائياً؟ لا يمكن التراجع عن هذا الإجراء.');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-archive fa-4x mb-3 text-muted"></i>
+                    <h5>لا توجد ملاحظات مؤرشفة حالياً</h5>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

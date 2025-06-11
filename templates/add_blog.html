@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}إضافة مقالة جديدة - يلا تاسكات{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>إضافة مقالة جديدة</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('add_blog') }}">
+                        <div class="mb-3">
+                            <label for="blog_name" class="form-label">اسم المدونة</label>
+                            <input type="text" class="form-control" id="blog_name" name="blog_name" list="blog_names" required>
+                            <datalist id="blog_names">
+                                {% for name in blog_names %}
+                                    <option value="{{ name }}">
+                                {% endfor %}
+                            </datalist>
+                            <div class="form-text">اختر اسماً من القائمة أو اكتب اسماً جديداً</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label">عنوان المقالة</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content" class="form-label">محتوى المقالة</label>
+                            <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="keywords" class="form-label">الكلمات المفتاحية (افصل بينها بفاصلة)</label>
+                                <input type="text" class="form-control" id="keywords" name="keywords">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="sub_keywords" class="form-label">كلمات مفتاحية فرعية (افصل بينها بفاصلة)</label>
+                                <input type="text" class="form-control" id="sub_keywords" name="sub_keywords">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">الوسوم (افصل بينها بفاصلة)</label>
+                            <input type="text" class="form-control" id="tags" name="tags">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="meta_descriptions" class="form-label">وصف الميتا (سطر واحد لكل وصف)</label>
+                            <textarea class="form-control" id="meta_descriptions" name="meta_descriptions" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="permalinks" class="form-label">روابط دائمة (سطر واحد لكل رابط)</label>
+                            <textarea class="form-control" id="permalinks" name="permalinks" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('blogs') }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i> إلغاء
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> حفظ المقالة
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
